@@ -6,8 +6,8 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "miniaudio.h"
 
-std::string getAudioFilePath(Audio audio) {
-    return audio.audioPath.u8string();
+FilePath AudioManager::getAudioFilePath(Audio audio) {
+    return audio.filePath.u8string();
 }
 
 AudioManager::AudioManager() {
@@ -21,7 +21,12 @@ AudioManager::~AudioManager() {
 }
 
 bool AudioManager::LoadAudio(Audio audio) {
-    std::string audioFilePath = getAudioFilePath(audio);
+    FilePath audioFilePath = getAudioFilePath(audio);
+    
+    if (loadedAudios.find(audioFilePath) != loadedAudios.end()) {
+        std::cout << "Audio is already loaded: " << audioFilePath << std::endl;
+        return true;
+    }
     ma_sound& loadedAudio = AudioManager::loadedAudios[audioFilePath];
 
     if (ma_sound_init_from_file(&engine, audioFilePath.c_str(), 0, NULL, NULL, &loadedAudio) != MA_SUCCESS) {
@@ -39,7 +44,7 @@ void AudioManager::PlayMASound(ma_sound& sound, float volume) {
 }
 
 bool AudioManager::PlayAudio(Audio audio) {
-    std::string audioFilePath = getAudioFilePath(audio);
+    FilePath audioFilePath = getAudioFilePath(audio);
 
     if (AudioManager::loadedAudios.find(audioFilePath) == AudioManager::loadedAudios.end()) {
         bool loadSuccess = LoadAudio(audio);
@@ -49,6 +54,6 @@ bool AudioManager::PlayAudio(Audio audio) {
     }
     ma_sound& loadedAudio = AudioManager::loadedAudios[audioFilePath];
     std::cout << "Playing audio: " << audioFilePath << std::endl;
-    PlayMASound(loadedAudio, 1.0f); //audio.volume
+    PlayMASound(loadedAudio, audio.volume); 
     return true;
 }
