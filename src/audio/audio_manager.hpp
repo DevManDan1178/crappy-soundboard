@@ -18,7 +18,7 @@ public:
      * @param audio the audio to load
      * @return if it was successful or not
      */
-    bool LoadAudio(Audio audio);
+    bool LoadAudio(const Audio& audio);
     /**
      * @brief plays the audio (and loads it first if it is not loaded)
      * (if not loaded) Calls LoadAudio with the audio
@@ -26,9 +26,9 @@ public:
      * @param audio the audio to play
      * @return if it was successful or not
      */
-    bool PlayAudio(Audio audio);
+    bool PlayAudio(const Audio& audio);
 
-    FilePath getAudioFilePath(Audio audio);
+    FilePath getAudioFilePath(const Audio& audio);
 
 private:
     std::unordered_map<FilePath, ma_sound> loadedAudios;
@@ -37,5 +37,5 @@ private:
      * @param sound the loaded sound
      * @param volume the volume to play it at
      */
-    void PlayMASound(ma_sound& sound, float volume = 1.0f);
+    void PlayMASound(ma_sound& sound, const float& volume = 1.0f);
 };
