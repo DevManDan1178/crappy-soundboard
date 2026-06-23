@@ -7,7 +7,7 @@
 #include "miniaudio.h"
 
 FilePath AudioManager::getAudioFilePath(Audio audio) {
-    return audio.filePath.u8string();
+    return audio.filePath.string();
 }
 
 AudioManager::AudioManager() {
