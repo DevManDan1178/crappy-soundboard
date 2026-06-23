@@ -9,6 +9,9 @@ class Soundboard {
 public:
     AudioTable audioTable;
     AudioManager audioManager;
+    /**
+     * Add keybinds
+     */
 
     /**
      * @brief plays the sound in the sound tables
@@ -16,5 +19,5 @@ public:
      * @param index index in the table [from 0]
      * @return if it was successful or not
      */
-    bool PlaySound(int tableIndex, int index);
+    bool PlayAudio(int tableIndex, int index);
 };
