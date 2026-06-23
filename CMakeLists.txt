@@ -16,12 +16,11 @@ endif()
 
 # ---- Find packages installed by vcpkg ----
 find_package(SDL2 CONFIG REQUIRED)
-find_package(nlohmann_json CONFIG REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # ---- External subdirectories ----
 add_subdirectory(external/nativefiledialog-extended)
-
+add_subdirectory(external/json)
 # ---- Your executable ----
 add_executable(Soundboard
     # Core
@@ -74,4 +73,5 @@ target_include_directories(Soundboard PRIVATE
 
     ${CMAKE_CURRENT_SOURCE_DIR}/external/nativefiledialog-extended/src/include
     ${CMAKE_CURRENT_SOURCE_DIR}/external/miniaudio
+    
 )
