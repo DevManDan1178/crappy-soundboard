@@ -34,7 +34,7 @@ add_executable(Soundboard
     # Input
     src/input/input_manager.cpp
     src/input/hotkey_manager.cpp
-    src/input/hotkey_translator.cpp
+    src/input/input.cpp
     # Event
     src/event/event_dispatcher.cpp
     src/event/event.cpp

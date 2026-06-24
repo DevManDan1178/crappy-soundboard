@@ -1,9 +1,67 @@
-#include "input/hotkey_translator.hpp"
+#include "input/input.hpp"
 #include "uiohook.h"
 
-int HotkeyTranslator::ParseSDLScancode(const SDL_Scancode& scanCode) {
-    switch (scanCode)
-    {
+
+Modifiers& Input::getModifierState() {
+    Modifiers modifiers;
+    SDL_Keymod sdlModifiers = SDL_GetModState();
+    
+    for (const auto& [sdlKeymod, modifierValue] : HOTKEY_MODIFIERS) {
+        if (sdlModifiers & sdlKeymod) {
+            modifiers |= modifierValue;
+        }
+    }
+    return modifiers;
+}
+
+Hotkey Input::queryHotkey() {
+    SDL_Event event;
+    while (true) {
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_KEYDOWN) {
+                SDL_Scancode scanCode = event.key.keysym.scancode;
+                
+                if (IsScancodeInvalid(scanCode)) {
+                    continue;
+                }
+                
+                //Modifiers
+                for (SDL_Scancode modifierCode : Hotkey::SDL_MODIFIER_CODES) {
+                    if (modifierCode == scanCode) {
+                        continue;
+                    }
+                }
+
+                int keyCode = ParseSDLScancode(scanCode);
+                
+                Modifiers& modifiers = getModifierState();                
+                return {keyCode, BindType::Keyboard, modifiers};
+            }
+
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
+                if (event.button.button == SDL_BUTTON_LEFT || event.button.button == SDL_BUTTON_RIGHT) {
+                    continue;
+                }
+
+                Modifiers& modifiers = getModifierState();  
+                return {(int) event.button.button, BindType::Mouse, modifiers};
+            }
+
+            if (event.type == SDL_QUIT) {
+                return {};
+            }
+        }
+    }
+}
+
+
+bool Input::IsScancodeInvalid(const SDL_Scancode& scanCode) {
+    return scanCode == VC_UNDEFINED;
+}
+
+
+int Input::ParseSDLScancode(const SDL_Scancode& scanCode) {
+    switch (scanCode) {
         case SDL_SCANCODE_A: return VC_A;
         case SDL_SCANCODE_B: return VC_B;
         case SDL_SCANCODE_C: return VC_C;
@@ -72,9 +130,4 @@ int HotkeyTranslator::ParseSDLScancode(const SDL_Scancode& scanCode) {
         default:
             return VC_UNDEFINED;
     }
-}
-
-
-bool HotkeyTranslator::IsScancodeInvalid(const SDL_Scancode& scanCode) {
-    return scanCode == VC_UNDEFINED;
 }
