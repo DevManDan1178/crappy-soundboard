@@ -1,31 +1,81 @@
 #include "imgui.h"
 #include "ui/configuration_UI.hpp"
 #include "ui/file_dialog.hpp"
+#include "input/input.hpp"
 #include <format>
 #include <string>
 #include <filesystem>
 
-constexpr float INDENT = 20.0f;
+constexpr float INDENT = 10.0f;
+
+
 constexpr float VOLUME_SLIDER_WIDTH = 200.0f;
-constexpr float MASTER_VOLUME_SLIDER_WIDTH = 400.0f;
+constexpr float MASTER_VOLUME_SLIDER_WIDTH = 300.0f;
 constexpr float WHEEL_DISPLAY_PADDING_TOP = 5.0f;
 constexpr float AUDIO_DISPLAY_PADDING_X = 20.0f;
+
 constexpr float ADD_AUDIO_PADDING_TOP = 10.0f; //Only if there are audio displays above
 constexpr float ADD_WHEEL_PADDING_TOP = 15.0f; //Only if there are wheel displays above
+
+constexpr float HOTKEY_BUTTON_MINIMUM_WIDTH = 75.0f;
+constexpr float HOTKEY_BUTTON_PADDING_TOP = 5.0f;
+
+constexpr float SECTION_TITLE_PADDING_BOTTOM = 5.0f;
+constexpr float SECTION_PADDING = 20.0f;
+
+constexpr const char* HOTKEY_CONFIGURATIONS_TITLE = "------ HOTKEYS ------";
+constexpr const char* AUDIO_CONFIGURATIONS_TITLE  = "--- SOUND EFFECTS ---";
 
 void AUDIO_DISPLAY_PADDING() {
     ImGui::SameLine(0, AUDIO_DISPLAY_PADDING_X);
 }
 
+void ConfigurationUI::RenderHotkeyConfigurations(Soundboard& soundboard) {
+    HotkeyManager& hotkeyManager = soundboard.hotkeyManager;
+    Hotkey& openWheelHotkey = hotkeyManager.openWheelHotkey;
+    
+    ImGui::Text(HOTKEY_CONFIGURATIONS_TITLE); 
+    ImGui::Dummy(ImVec2(0, SECTION_TITLE_PADDING_BOTTOM));
+
+    ImGui::Indent(INDENT);
+    ImGui::Text("Open Emote Wheel");
+    
+    
+    static auto hotkeyButton = [](const char* buttonText) -> bool {
+        ImGui::Dummy(ImVec2(0, HOTKEY_BUTTON_PADDING_TOP));
+        float textWidth = ImGui::CalcTextSize(buttonText).x;
+        float width = (textWidth + ImGui::GetStyle().FramePadding.x * 2.0f);
+        width = (width < HOTKEY_BUTTON_MINIMUM_WIDTH) ? HOTKEY_BUTTON_MINIMUM_WIDTH : width;
+        return ImGui::Button(buttonText, ImVec2(width, 0.0f));
+    };
+
+    ImGui::Indent(INDENT);
+    
+    if (hotkeyButton(std::format("{0}##OpenWheel", Input::HotkeyToString(openWheelHotkey)).c_str())) {
+        openWheelHotkey = Input::QueryHotkey();
+    }
+    ImGui::Unindent(INDENT);
+
+    ImGui::Dummy(ImVec2(0, SECTION_TITLE_PADDING_BOTTOM));
+    ImGui::Text("[!] Modifier keys: [Ctrl], [Alt], [Shift]");
+    
+    ImGui::Unindent(INDENT);
+}
+
 void ConfigurationUI::RenderAudioConfigurations(Soundboard& soundboard) {
     AudioTable& audioTable = soundboard.audioTable;
     AudioManager& audioManager = soundboard.audioManager;
+
+    ImGui::Text(AUDIO_CONFIGURATIONS_TITLE);
+    ImGui::Dummy(ImVec2(0, SECTION_TITLE_PADDING_BOTTOM));
     ImGui::Indent(INDENT);
 
     float* masterVolume = &audioManager.masterVolume;
 
     ImGui::SetNextItemWidth(MASTER_VOLUME_SLIDER_WIDTH);
     ImGui::SliderFloat("##MasterVolume", masterVolume, 0, 2, "Master Volume: %.2f");
+    ImGui::SameLine();
+    ImGui::Text("[Ctrl + Click] for Manual Input");
 
     const size_t wheelsCount = audioTable.size();
     for (size_t tableIdx = 0; tableIdx < wheelsCount; tableIdx++) {  
@@ -89,10 +139,12 @@ void ConfigurationUI::RenderAudioConfigurations(Soundboard& soundboard) {
     ImGui::Unindent(INDENT);
 }
 
-void ConfigurationUI::RenderKeybindConfigurations(Soundboard& soundboard) {
-    //Changing keybinds
-}
-
 void ConfigurationUI::Render(Soundboard& soundboard) {
+    ImGui::PushItemFlag(ImGuiItemFlags_NoTabStop, true); //Prevents tab from focusing elements
+
     RenderAudioConfigurations(soundboard);
+    ImGui::Dummy(ImVec2(0, SECTION_PADDING));
+    RenderHotkeyConfigurations(soundboard);
+
+    ImGui::PopItemFlag();
 }
