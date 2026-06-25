@@ -1,9 +1,10 @@
 #pragma once
 #include "input/hotkeys.hpp"
 #include <unordered_map>
+#include "input/input_listener.hpp"
 
 class HotkeyManager {
-public:   
+public:  
     Hotkey openWheelHotkey;
     
     /**
@@ -11,4 +12,5 @@ public:
      * @return if it was successfully set or not
      */
     bool SetOpenWheelHotkey(Hotkey hotkey);
+
 };  
