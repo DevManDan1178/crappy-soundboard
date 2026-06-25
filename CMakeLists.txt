@@ -32,12 +32,11 @@ add_executable(Soundboard
     src/ui/wheel_UI.cpp
     src/ui/configuration_UI.cpp
     # Input
-    src/input/input_manager.cpp
     src/input/hotkey_manager.cpp
+    src/input/input_listener.cpp
     src/input/input.cpp
     # Event
     src/event/event_dispatcher.cpp
-    src/event/event.cpp
     # Audio
     src/audio/audio_manager.cpp
     # Soundboard
