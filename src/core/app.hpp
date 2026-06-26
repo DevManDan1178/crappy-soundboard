@@ -3,18 +3,23 @@
 #include "config/config_manager.hpp"
 #include "event/event.hpp"
 
+
 class App {
 public:
     Soundboard soundboard;
-    ConfigManager configManager;
-
+    ConfigManager* configManager;
     bool wheelVisible = false;
-    unsigned int currentWheelIdx = 0;
+    unsigned int wheelIndex = 0;
+    int wheelSelectedIndex = -1;
+
+    App();
+
     /**
      * @brief Initializes the app (keeps running until application end)
      */
     void Initialize();
 
+    
 private:
     /**
      * @brief Initializes the UI loop (keeps running until application end)

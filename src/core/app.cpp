@@ -1,6 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <functional>
+#include <algorithm>
 
 #include "core/app.hpp"
 #include "ui/file_dialog.hpp"
@@ -8,6 +9,7 @@
 #include "audio/audio_manager.hpp"
 #include "audio/audio.hpp"
 #include "event/event_dispatcher.hpp"
+#include "config/config_manager.hpp"
 
 #include "SDL.h"
 #include <SDL_opengl.h>
@@ -27,8 +29,7 @@ void App::ShowWheel(std::vector<std::string> elements) {
         viewport->Pos.y + viewport->Size.y * 0.5f
     );
 
-    // render
-    int choice = WheelUI::RenderSelectionWheel(elements, wheelVisible, screenCenter);
+    wheelSelectedIndex = WheelUI::RenderSelectionWheel(elements, wheelIndex, wheelVisible, screenCenter);
 }
 
 
@@ -47,7 +48,14 @@ void App::UI() {
     );
     
     if (wheelVisible) {
-       ShowWheel({"A", "B", "C", "D"});
+        std::vector<Audio>* wheelAudios = soundboard.GetAudiosAtIndex(wheelIndex);
+        std::vector<std::string> wheelAudioNames;
+        wheelAudioNames.reserve(wheelAudios->size());
+        for (Audio audio : *wheelAudios) {
+            wheelAudioNames.push_back(audio.name);
+        }
+
+        ShowWheel(wheelAudioNames);
     }
 
     ConfigurationUI::Render(soundboard);
@@ -151,11 +159,28 @@ void App::InitializeUI() {
 }
 
 
+App::App() {
+    configManager = new ConfigManager(soundboard);
+}
+
 void App::HandleEvent(const Event& event) {
     if (event.getType() == EventType::ToggleWheel){
-        std::cout << "Request to open wheel" << std::endl;
+        if (soundboard.AudioTableSize() == 0) {
+            return;
+        }
         const ToggleWheelEvent& toggleWheelEvent = dynamic_cast<const ToggleWheelEvent&>(event);
         wheelVisible = toggleWheelEvent.visible;
+        if (!wheelVisible) {
+            soundboard.PlayAudio(wheelIndex, wheelSelectedIndex);
+        }
+    } else if (event.getType() == EventType::WheelScroll) {
+        unsigned int audioTableSize = soundboard.AudioTableSize();
+        if (audioTableSize <= 1) {
+            return;
+        }
+        const WheelScrollEvent& wheelScrollEvent = dynamic_cast<const WheelScrollEvent&>(event);
+        int deltaWheelIndex = wheelScrollEvent.scrollDirection ? 1 : -1;
+        wheelIndex = (wheelIndex + deltaWheelIndex + audioTableSize) % audioTableSize;
     }
 };
 
