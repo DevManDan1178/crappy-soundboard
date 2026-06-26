@@ -33,7 +33,6 @@ bool AudioManager::LoadAudio(const Audio& audio) {
         std::cout << "Failed to load audio: " << audioFilePath << std::endl;
         return false;
     }
-    std::cout << "Loaded audio: " << audioFilePath << std::endl;
     return true;
 }
 
@@ -53,7 +52,6 @@ bool AudioManager::PlayAudio(const Audio& audio) {
         }
     }
     ma_sound& loadedAudio = AudioManager::loadedAudios[audioFilePath];
-    std::cout << "Playing audio: " << audio.name << std::endl;
     PlayMASound(loadedAudio, audio.volume * masterVolume); 
     return true;
 }
