@@ -10,6 +10,11 @@
 using HotkeyCallbacks = std::unordered_map<Hotkey, Callback>;
 
 /**
+ * Callbacks for scrolling
+ */
+std::unordered_map<bool, Callback> scroll_bindings;
+
+/**
  * Hotkey callbacks for pressed
  */
 HotkeyCallbacks pressed_bindings;
@@ -70,6 +75,16 @@ void DispatchUIOHOOKEvent(uiohook_event* event) {
         case EVENT_MOUSE_RELEASED:
             isKeyboard = isPressed = false;
             break;
+        case EVENT_MOUSE_WHEEL: {
+            bool scrollDir = event-> data.wheel.direction < 0;
+            
+            if (!scroll_bindings.contains(scrollDir)) {
+                return;
+            }
+
+            scroll_bindings[scrollDir]();        
+            return;
+        }
         default:
             return;
     }
@@ -93,13 +108,16 @@ void DispatchUIOHOOKEvent(uiohook_event* event) {
         isKeyboard ? BindType::Keyboard : BindType::Mouse, 
         GetUIOHOOKEventModifiers(event->mask)
     };
+    
     HotkeyCallbacks& hotkeyCallbackList = isPressed ? pressed_bindings : released_bindings;
     if (!hotkeyCallbackList.contains(detectedHotkey)) {
-        std::cout << "no detected hotkey " << std::endl;
         return;
     }
-    const Callback& callback = hotkeyCallbackList[detectedHotkey];
-    callback();
+    hotkeyCallbackList[detectedHotkey]();
+}
+
+void InputListener::SetOnScroll(bool scrollDirection, const Callback& callback) {
+    scroll_bindings[scrollDirection] = callback;
 }
 
 void InputListener::SetOnHotkeyPress(const Hotkey& hotkey, const Callback& callback) {

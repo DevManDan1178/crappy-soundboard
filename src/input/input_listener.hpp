@@ -29,6 +29,13 @@ namespace InputListener {
     void SetOnHotkeyRelease(const Hotkey& hotkey, const Callback& callback);
     
     /**
+     * @brief Links the callback to a mouse wheel scroll
+     * @param scrollDirection direction of the scroll (True, False) => (Up, Down)
+     * @param callback the callback
+     */
+    void SetOnScroll(bool scrollDirection, const Callback& callback);
+
+    /**
      * @brief Unlinks the callback to the hotkey calling it on every press
      * @param hotkey the hotkey
      */
