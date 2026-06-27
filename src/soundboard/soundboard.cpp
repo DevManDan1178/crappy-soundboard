@@ -2,10 +2,10 @@
 #include <optional>
 
 
-bool Soundboard::PlayAudio(unsigned int tableIndex, unsigned int index) {
+bool Soundboard::PlayAudio(unsigned int tableIndex, unsigned int index, bool ignoreVirtualDevice) {
     std::optional<Audio> audio = audioTable.GetAudio(tableIndex, index);
     if (audio.has_value()) {
-        audioManager.PlayAudio(*audio);
+        audioManager.PlayAudio(*audio, ignoreVirtualDevice);
         return true;
     }
     return false;
@@ -20,4 +20,9 @@ std::vector<Audio>* Soundboard::GetAudiosAtIndex(unsigned int index) {
         return {};
     }
     return audioTable.GetAudiosAtIdx(index);
+}
+
+
+void Soundboard::StopAllAudio() {
+    audioManager.StopAllAudio();
 }

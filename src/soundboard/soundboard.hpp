@@ -16,11 +16,16 @@ public:
      * @brief plays the sound in the sound tables
      * @param tableIndex index of the table [from 0]
      * @param index index in the table [from 0]
+     * @param ignoreVirtualDevice if to ignore ignore the virtual device and play on speakers only
      * @return if it was successful or not
      */
-    bool PlayAudio(unsigned int tableIndex, unsigned int index);
+    bool PlayAudio(unsigned int tableIndex, unsigned int index, bool ignoreVirtualDevice = false);
 
-
+    /**
+     * Stops all audios
+     */
+    void StopAllAudio();
+    
     /**
      * @brief gets the size of the audio table
      * @return size of the audio table
