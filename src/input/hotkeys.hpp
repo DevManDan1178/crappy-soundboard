@@ -45,7 +45,9 @@ struct Hotkey {
         SDL_SCANCODE_LCTRL, SDL_SCANCODE_RCTRL,
         SDL_SCANCODE_LALT, SDL_SCANCODE_RALT
     };
-    bool operator==(const Hotkey&) const = default;
+    bool operator==(const Hotkey& other) const {
+        return keyCode == other.keyCode && modifiers == other.modifiers && bindType == other.bindType;
+    };
 };
 
 namespace std {
